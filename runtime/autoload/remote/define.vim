@@ -156,14 +156,15 @@ endfunction
 
 
 function! remote#define#FunctionOnChannel(channel, method, sync, name, opts)
-  let rpcargs = [a:channel, '"'.a:method.'"', 'a:000']
+  let rpcargs = [a:channel, '"'.a:method.'"']
   if has_key(a:opts, 'range')
     call add(rpcargs, '[a:firstline, a:lastline]')
   endif
   call s:AddEval(rpcargs, a:opts)
 
   let function_def = s:GetFunctionPrefix(a:name, a:opts)
-        \ . 'return '.s:GetRpcFunction(a:sync).'('.join(rpcargs, ', ').')'
+        \ . 'return call("'.s:GetRpcFunction(a:sync).'", '
+        \ . '['.join(rpcargs, ', ').'] + a:000)'
         \ . "\nendfunction"
   exe function_def
 endfunction
